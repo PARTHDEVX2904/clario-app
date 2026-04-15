@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply tracking-tight;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Instrument Serif', Georgia, serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+/* Framer Motion — respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
