@@ -1,6 +1,6 @@
-# Mediva — Healthcare Billing Intelligence
+# Clario — Healthcare Billing Intelligence
 
-Mediva is a patient-facing app that helps people understand hospital and medical bills in plain English, identify potentially questionable charges, find savings opportunities, and generate dispute/negotiation documents.
+Clario is a patient-facing app that helps people understand hospital and medical bills in plain English, identify potentially questionable charges, find savings opportunities, and generate dispute/negotiation documents.
 
 ## Features
 
@@ -18,7 +18,7 @@ Mediva is a patient-facing app that helps people understand hospital and medical
 ### 1. Clone and install
 ```bash
 git clone <your-repo>
-cd mediva
+cd clario
 npm install
 ```
 
@@ -148,4 +148,4 @@ OCR_PROVIDER=tesseract
 
 ## Disclaimer
 
-Mediva provides informational support only. It is not legal advice, medical advice, or a guarantee of any billing outcome. Always consult a certified patient advocate, healthcare attorney, or your insurance company for definitive guidance.
+Clario provides informational support only. It is not legal advice, medical advice, or a guarantee of any billing outcome. Always consult a certified patient advocate, healthcare attorney, or your insurance company for definitive guidance.
