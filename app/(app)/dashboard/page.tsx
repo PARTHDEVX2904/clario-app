@@ -154,7 +154,7 @@ export default async function DashboardPage({
             💡 Did you know?
           </h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Studies show that 3 in 4 medical bills contain errors. Common issues include duplicate charges, vague facility fees, and charges for services not received. Mediva helps you find these before you pay.
+            Studies show that 3 in 4 medical bills contain errors. Common issues include duplicate charges, vague facility fees, and charges for services not received. Clario helps you find these before you pay.
           </p>
         </div>
       </div>

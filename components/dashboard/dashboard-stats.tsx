@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, TrendingDown, AlertTriangle } from "lucide-react";
+import { FileText, TrendingDown, AlertTriangle, BarChart2 } from "lucide-react";
 import { StatsCard } from "./stats-card";
 import { formatCurrency } from "@/lib/utils/format";
 
@@ -24,6 +24,9 @@ export function DashboardStats({
         value={formatCurrency(totalBilled)}
         subtitle="Across all analyses"
         icon={FileText}
+        iconColor="text-[#09637E]"
+        iconBg="bg-[#E6F4F7]"
+        accentBar="bg-[#09637E]"
         delay={0}
       />
       <StatsCard
@@ -31,8 +34,10 @@ export function DashboardStats({
         value={formatCurrency(totalSavings)}
         subtitle="If all disputes succeed"
         icon={TrendingDown}
-        iconColor="text-accent"
-        iconBg="bg-accent-50"
+        iconColor="text-emerald-600"
+        iconBg="bg-emerald-50"
+        valueColo="text-emerald-600"
+        accentBar="bg-emerald-500"
         delay={0.06}
       />
       <StatsCard
@@ -40,17 +45,19 @@ export function DashboardStats({
         value={String(flaggedCount)}
         subtitle="Across all bills"
         icon={AlertTriangle}
-        iconColor="text-warning-500"
-        iconBg="bg-warning-50"
+        iconColor="text-amber-500"
+        iconBg="bg-amber-50"
+        accentBar="bg-amber-400"
         delay={0.12}
       />
       <StatsCard
         title="Analyses"
         value={String(analysesCount)}
         subtitle="Bills reviewed"
-        icon={FileText}
-        iconColor="text-primary-500"
-        iconBg="bg-primary-50"
+        icon={BarChart2}
+        iconColor="text-[#2F2FE4]"
+        iconBg="bg-[#EEEFFD]"
+        accentBar="bg-[#2F2FE4]"
         delay={0.18}
       />
     </div>

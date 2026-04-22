@@ -3,24 +3,38 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Inter } from "next/font/google";
 import { formatCurrency, formatDateRelative } from "@/lib/utils/format";
-import { Badge } from "@/components/ui/badge";
 import type { AnalysisResult } from "@/types";
+
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 interface RecentAnalysesProps {
   analyses: (AnalysisResult & { providerName?: string; caseId: string })[];
 }
 
-function StatusIcon({ status }: { status: string }) {
+function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case "complete":
-      return <CheckCircle className="h-4 w-4 text-accent" />;
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+          <CheckCircle className="h-3 w-3" /> Done
+        </span>
+      );
     case "processing":
-      return <Clock className="h-4 w-4 text-warning-500 animate-pulse" />;
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
+          <Clock className="h-3 w-3 animate-pulse" /> Processing
+        </span>
+      );
     case "error":
-      return <AlertCircle className="h-4 w-4 text-destructive" />;
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-500">
+          <AlertCircle className="h-3 w-3" /> Error
+        </span>
+      );
     default:
-      return <Clock className="h-4 w-4 text-muted-foreground" />;
+      return null;
   }
 }
 
@@ -28,19 +42,22 @@ export function RecentAnalyses({ analyses }: RecentAnalysesProps) {
   if (analyses.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-[#FAFAFA] shadow-card overflow-hidden">
-      <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-foreground">Recent analyses</h2>
+    <div className={`${inter.className} rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden`}>
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900">Recent analyses</h2>
+          <p className="text-[11px] text-slate-400 font-medium mt-0.5">{analyses.length} bills reviewed</p>
+        </div>
         <Link
           href="/dashboard"
-          className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#09637E] hover:text-[#088395] transition-colors"
         >
-          View all
-          <ArrowRight className="h-3 w-3" />
+          View all <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
 
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-slate-100">
         {analyses.map((analysis, i) => (
           <motion.div
             key={analysis.id}
@@ -50,35 +67,39 @@ export function RecentAnalyses({ analyses }: RecentAnalysesProps) {
           >
             <Link
               href={`/analysis/${analysis.id}`}
-              className="flex items-center gap-4 px-6 py-4 hover:bg-muted/40 transition-colors group"
+              className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50/70 transition-colors group"
             >
-              <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                <FileText className="h-4 w-4 text-muted-foreground" />
+              {/* Icon */}
+              <div className="h-10 w-10 rounded-xl bg-[#E6F4F7] flex items-center justify-center shrink-0">
+                <FileText className="h-4 w-4 text-[#09637E]" />
               </div>
 
+              {/* Provider + time */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
+                <p className="text-sm font-semibold text-slate-900 truncate">
                   {analysis.providerName || "Unknown Provider"}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[11px] text-slate-400 font-medium mt-0.5">
                   {formatDateRelative(analysis.createdAt)}
                 </p>
               </div>
 
+              {/* Status badge */}
+              <StatusBadge status={analysis.status} />
+
+              {/* Amount */}
               <div className="text-right shrink-0">
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-bold text-slate-900">
                   {formatCurrency(analysis.totalBilled)}
                 </p>
                 {analysis.potentialSavings > 0 && (
-                  <p className="text-xs text-accent-600 font-medium">
+                  <p className="text-[11px] font-semibold text-emerald-600 mt-0.5">
                     Save {formatCurrency(analysis.potentialSavings)}
                   </p>
                 )}
               </div>
 
-              <StatusIcon status={analysis.status} />
-
-              <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <ArrowRight className="h-4 w-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </Link>
           </motion.div>
         ))}
