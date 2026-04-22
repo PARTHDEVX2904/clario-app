@@ -1,15 +1,15 @@
 # Clario — CLAUDE.md
 
 ## Project overview
-Clario is a patient-facing healthcare billing intelligence app. It helps patients understand medical bills in plain English, identify questionable charges, reduce out-of-pocket costs, and generate dispute/negotiation drafts.
+Clario is a patient-facing healthcare billing intelligence app. Helps patients understand medical bills in plain English, spot overcharges, and generate dispute/negotiation drafts.
 
 ## Tech stack
 - **Framework:** Next.js 15 (App Router) + React 19
-- **Language:** TypeScript (strict, everywhere)
+- **Language:** TypeScript (strict)
 - **Styling:** Tailwind CSS v3 + class-variance-authority
-- **Animation:** Framer Motion — `opacity`+`y` only, `duration` ≤ 0.4s, no bounce physics
-- **AI:** OpenAI API (GPT-4o) — adapter pattern, swappable
-- **OCR:** Tesseract.js — adapter pattern, swappable
+- **Animation:** Framer Motion — `opacity`+`y` only, `duration` ≤ 0.4s, no bounce
+- **AI:** Groq / Gemini — adapter pattern (`lib/ai/`), swappable
+- **OCR:** Tesseract.js — adapter pattern (`lib/ocr/`), swappable
 - **Database:** Supabase (Postgres + Auth + Storage)
 - **Deployment:** Vercel
 
@@ -28,33 +28,37 @@ components/
   analysis/       # Bill analysis display components
   auth/           # AuthForm
 lib/
-  ai/             # Adapter interface + mock + openai implementations
-  ocr/            # Adapter interface + mock + tesseract implementations
-  supabase/       # Browser + server clients
-  billing/        # Heuristics, mock data
+  ai/             # adapter.ts, groq.ts, gemini.ts, mock.ts
+  ocr/            # adapter + tesseract + mock
+  supabase/       # browser + server clients
+  billing/        # heuristics.ts, conditions-kb.ts, mock data
   utils/          # cn(), format helpers
 types/            # Domain types + DB types
 ```
 
 ## Key conventions
 - **Server components by default.** Add `"use client"` only for interactivity/hooks/browser APIs.
-- **Adapter pattern.** Never call OpenAI or Tesseract directly — go through `lib/ai/` and `lib/ocr/`.
-- **Environment-switched providers.** `AI_PROVIDER=mock|openai`, `OCR_PROVIDER=mock|tesseract`.
-- **No secrets in client components.** `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` are server-only.
+- **Adapter pattern.** Never call AI/OCR providers directly — go through `lib/ai/` and `lib/ocr/`.
+- **Environment-switched providers.** `AI_PROVIDER=mock|groq|gemini`, `OCR_PROVIDER=mock|tesseract`.
+- **No secrets in client components.** `SUPABASE_SERVICE_ROLE_KEY` and API keys are server-only.
 - **`cn()` for all class merging.** Import from `@/lib/utils/cn`.
 - **Zod validation** at all API and form boundaries.
 
-## Mock seams (MVP — keep swappable)
-- `lib/ai/mock.ts` — static realistic analysis result
-- `lib/ocr/mock.ts` — sample extracted bill text
-- `lib/supabase/` — falls back to in-memory when Supabase isn't configured
-
 ## Design system
-- **Background:** `#EBF4F6` | **Primary:** `#09637E` | **Primary alt:** `#088395`
-- **Muted teal:** `#7AB2B2` | **Warning:** `#D97706` | **Destructive:** `#DC2626`
-- **Font:** DM Sans (body/UI), Instrument Serif (display headings only — hero/how-it-works/trust), Merriweather (logo)
+- **Background:** `#FFFFFF` (white) | **Primary:** `#09637E` | **Accent:** `#088395`
+- **Warning:** `#D97706` | **Destructive:** `#DC2626`
+- **Brand blue:** `#2F2FE4` (logo, typewriter words, accents)
+- **Fonts:** Inter (all headings + body via `--font-inter` CSS var + `--font-jakarta` DM Sans fallback)
+  - `font-display` → Inter (was Instrument Serif — now replaced globally)
+  - Logo wordmark "Clario" → Inter 600, `text-black`
 - **Cards:** white, `shadow-card` / `shadow-card-hover` | **Borders:** `border-border` (`#C4DDE3`)
-- Marketing background: radial gradient from `#7AB2B2` → `#EBF4F6`
+- **Section backgrounds:** Hero `bg-white` | Features `bg-[#d4f5fa]` | How-it-works `bg-white` | Footer `bg-[#d4f5fa]`
+- **Buttons (default variant):** black (`bg-black hover:bg-gray-900`)
+
+## Hero section specifics
+- Typewriter cycles: "decoded" → "simplified" → "explained" (lowercase, `font-black`, color `#2F2FE4`)
+- Blinking cursor `|` uses `@keyframes cursor-blink` in `globals.css`, `2s step-end infinite`
+- Trust bar: CreditCard icon + "No account required" in black, inline beside CTA button
 
 ## Charge flag statuses
 - `valid` — consistent with reported care
@@ -78,6 +82,7 @@ npm install && npm run dev
 | `NEXT_PUBLIC_SUPABASE_URL` | Placeholder OK for mock mode |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Placeholder OK for mock mode |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only |
-| `OPENAI_API_KEY` | Only if `AI_PROVIDER=openai` |
-| `AI_PROVIDER` | `mock` or `openai` |
+| `GROQ_API_KEY` | Only if `AI_PROVIDER=groq` |
+| `GEMINI_API_KEY` | Only if `AI_PROVIDER=gemini` |
+| `AI_PROVIDER` | `mock`, `groq`, or `gemini` |
 | `OCR_PROVIDER` | `mock` or `tesseract` |

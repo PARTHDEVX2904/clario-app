@@ -30,7 +30,7 @@ export function StatsCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35 }}
-      className="rounded-xl border border-border bg-white shadow-card p-5"
+      className="rounded-xl border border-border bg-[#FAFAFA] shadow-card p-5"
     >
       <div className="flex items-start justify-between mb-4">
         <p className="text-sm font-medium text-muted-foreground">{title}</p>

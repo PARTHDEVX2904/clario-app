@@ -3,6 +3,7 @@
 // Used to pre-process OCR output and validate AI results.
 
 import type { BillLineItem, HeuristicFlag, EpisodeOfCare } from "@/types";
+import type { ConditionEntry } from "./conditions-kb";
 
 // ── Duplicate charge detection ─────────────────────────────────────────────────
 
@@ -160,11 +161,43 @@ export function detectAmbiguousCharges(items: BillLineItem[]): HeuristicFlag[] {
   }, []);
 }
 
+// ── Condition-specific unexpected charge detection ────────────────────────────
+
+/**
+ * Flags line items whose description matches a treatment listed as
+ * "not expected" for the patient's diagnosed condition.
+ * Requires a ConditionEntry resolved from the conditions knowledge base.
+ */
+export function detectNotExpectedCharges(
+  items: BillLineItem[],
+  conditionEntry: ConditionEntry
+): HeuristicFlag[] {
+  const flags: HeuristicFlag[] = [];
+
+  items.forEach((item, index) => {
+    const desc = item.description.toLowerCase();
+    const matched = conditionEntry.notExpected.find((term) =>
+      desc.includes(term.toLowerCase())
+    );
+    if (matched) {
+      flags.push({
+        lineItemIndex: index,
+        type: "care_mismatch",
+        severity: "alert",
+        reason: `"${item.description}" is generally not expected for ${conditionEntry.conditionName}. This charge warrants review and justification from the treating doctor.`,
+      });
+    }
+  });
+
+  return flags;
+}
+
 // ── Run all heuristics ─────────────────────────────────────────────────────────
 
 export function runAllHeuristics(
   items: BillLineItem[],
-  episode: Partial<EpisodeOfCare>
+  episode: Partial<EpisodeOfCare>,
+  conditionEntry?: ConditionEntry
 ): HeuristicFlag[] {
   return [
     ...detectDuplicates(items),
@@ -172,5 +205,6 @@ export function runAllHeuristics(
     ...detectVagueFees(items),
     ...detectCareMismatch(items, episode),
     ...detectAmbiguousCharges(items),
+    ...(conditionEntry ? detectNotExpectedCharges(items, conditionEntry) : []),
   ];
 }

@@ -3,6 +3,7 @@ import { Hero } from "@/components/marketing/hero";
 import { Features } from "@/components/marketing/features";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { TrustSection } from "@/components/marketing/trust-section";
+import { FAQSection } from "@/components/marketing/faq-section";
 import { CTASection } from "@/components/marketing/cta-section";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function HomePage() {
       <Features />
       <HowItWorks />
       <TrustSection />
+      <FAQSection />
       <CTASection />
     </>
   );

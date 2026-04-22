@@ -28,7 +28,7 @@ export function RecentAnalyses({ analyses }: RecentAnalysesProps) {
   if (analyses.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-white shadow-card overflow-hidden">
+    <div className="rounded-xl border border-border bg-[#FAFAFA] shadow-card overflow-hidden">
       <div className="px-6 py-4 border-b border-border flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">Recent analyses</h2>
         <Link

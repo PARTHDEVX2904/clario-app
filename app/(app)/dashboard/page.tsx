@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  FileText,
-  TrendingDown,
-  AlertTriangle,
-  Upload,
-} from "lucide-react";
+import { Upload } from "lucide-react";
 import { AppHeader } from "@/components/layout/app-header";
-import { StatsCard } from "@/components/dashboard/stats-card";
+import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 import { RecentAnalyses } from "@/components/dashboard/recent-analyses";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Button } from "@/components/ui/button";
@@ -80,8 +75,21 @@ async function getRecentAnalyses(): Promise<DashboardAnalysis[]> {
   }
 }
 
-export default async function DashboardPage() {
-  const analyses = await getRecentAnalyses();
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string }>;
+}) {
+  const params = await (searchParams ?? Promise.resolve({ q: undefined }));
+  const searchQuery = (params.q ?? "").trim().toLowerCase();
+
+  const allAnalyses = await getRecentAnalyses();
+  const analyses = searchQuery
+    ? allAnalyses.filter((a) =>
+        (a.providerName ?? "").toLowerCase().includes(searchQuery)
+      )
+    : allAnalyses;
+
   const hasAnalyses = analyses.length > 0;
 
   const totalBilled = analyses.reduce((s, a) => s + a.totalBilled, 0);
@@ -91,8 +99,8 @@ export default async function DashboardPage() {
   return (
     <>
       <AppHeader
-        title="Dashboard"
-        subtitle="Your medical billing analyses"
+        title={searchQuery ? `Results for "${searchQuery}"` : "Dashboard"}
+        subtitle={searchQuery ? `${analyses.length} matching analysis${analyses.length !== 1 ? "es" : ""}` : "Your medical billing analyses"}
       />
 
       <div className="px-6 py-8 max-w-6xl mx-auto">
@@ -118,47 +126,22 @@ export default async function DashboardPage() {
 
         {/* Stats */}
         {hasAnalyses && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatsCard
-              title="Total billed"
-              value={`$${(totalBilled / 1000).toFixed(1)}k`}
-              subtitle="Across all analyses"
-              icon={FileText}
-              delay={0}
-            />
-            <StatsCard
-              title="Potential savings"
-              value={`$${(totalSavings / 1000).toFixed(1)}k`}
-              subtitle="If all disputes succeed"
-              icon={TrendingDown}
-              iconColor="text-accent"
-              iconBg="bg-accent-50"
-              delay={0.06}
-            />
-            <StatsCard
-              title="Charges flagged"
-              value={String(flaggedCount)}
-              subtitle="Across all bills"
-              icon={AlertTriangle}
-              iconColor="text-warning-500"
-              iconBg="bg-warning-50"
-              delay={0.12}
-            />
-            <StatsCard
-              title="Analyses"
-              value={String(analyses.length)}
-              subtitle="Bills reviewed"
-              icon={FileText}
-              iconColor="text-primary-500"
-              iconBg="bg-primary-50"
-              delay={0.18}
-            />
-          </div>
+          <DashboardStats
+            totalBilled={totalBilled}
+            totalSavings={totalSavings}
+            flaggedCount={flaggedCount}
+            analysesCount={analyses.length}
+          />
         )}
 
         {/* Recent analyses or empty state */}
         {hasAnalyses ? (
           <RecentAnalyses analyses={analyses} />
+        ) : searchQuery ? (
+          <div className="rounded-xl border border-border bg-white shadow-card px-6 py-12 text-center">
+            <p className="text-sm font-semibold text-foreground mb-1">No matching analyses</p>
+            <p className="text-xs text-muted-foreground">No bills found for &quot;{searchQuery}&quot;. Try a different provider name.</p>
+          </div>
         ) : (
           <div className="rounded-xl border border-border bg-white shadow-card">
             <EmptyState />

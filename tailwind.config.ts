@@ -18,7 +18,7 @@ const config: Config = {
     },
     extend: {
       colors: {
-        background: "#EBF4F6",
+        background: "#FFFFFF",
         foreground: "#111827",
         border: "#C4DDE3",
         input: "#C4DDE3",
@@ -84,7 +84,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        display: ["var(--font-instrument)", "Georgia", "serif"],
+        display: ["var(--font-inter)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
       },
       keyframes: {
@@ -108,6 +108,10 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(16px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -115,6 +119,7 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
+        blink: "blink 10s step-end infinite",
       },
       boxShadow: {
         card: "0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.06)",

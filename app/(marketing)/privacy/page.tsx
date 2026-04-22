@@ -10,7 +10,7 @@ const EFFECTIVE_DATE = "April 14, 2026";
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+    <main className="min-h-screen bg-[#F5F5F5]"><div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
       {/* Header */}
       <div className="mb-12">
         <p className="text-sm font-medium text-primary-600 mb-2">Legal</p>
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
         <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Use</Link>
         <Link href="/" className="hover:text-foreground transition-colors">← Back to home</Link>
       </div>
-    </main>
+    </div></main>
   );
 }
 

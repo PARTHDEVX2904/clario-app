@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getOCRAdapter } from "@/lib/ocr/adapter";
 import { getAIAdapter } from "@/lib/ai/adapter";
+import { preprocessForOCR, checkImageQuality } from "@/lib/ocr/preprocess";
+import { createVisionOCR } from "@/lib/ocr/vision-ocr";
+import { cleanOCRText } from "@/lib/ocr/postprocess";
+import { validateAIOutput } from "@/lib/ai/validate";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { runAllHeuristics } from "@/lib/billing/heuristics";
+import { findCondition } from "@/lib/billing/conditions-kb";
 import type { EpisodeOfCare } from "@/types";
 
-export const maxDuration = 60; // Vercel function timeout
+export const maxDuration = 120; // allows up to 2 Gemini retries on rate-limit
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +31,12 @@ export async function POST(req: NextRequest) {
       } catch {
         return NextResponse.json({ error: "Invalid episode data" }, { status: 400 });
       }
+    }
+
+    // Look up condition knowledge base entry for this patient's diagnosis
+    const conditionEntry = findCondition(episode.healthIssueDescription ?? "") ?? undefined;
+    if (conditionEntry) {
+      console.log(`[KB] Matched condition: "${conditionEntry.conditionName}" for health issue: "${episode.healthIssueDescription}"`);
     }
 
     // Validate file type
@@ -50,19 +62,54 @@ export async function POST(req: NextRequest) {
     const authClient = await createClient();
     const { data: { user } } = await authClient.auth.getUser();
 
-    // ── OCR ────────────────────────────────────────────────────────────────────
-    let ocrText: string;
-    try {
-      const buffer = Buffer.from(await billFile.arrayBuffer());
-      const ocrAdapter = await getOCRAdapter();
-      const ocrResult = await ocrAdapter.extractText(buffer, billFile.type);
-      ocrText = ocrResult.text;
-    } catch (err) {
-      console.error("OCR failed:", err);
-      return NextResponse.json({ error: "Failed to extract text from the bill." }, { status: 500 });
+    // ── Read file buffer ──────────────────────────────────────────────────────
+    const fileBuffer = Buffer.from(await billFile.arrayBuffer());
+    const fileMimeType = billFile.type;
+    const IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    const isImageFile = IMAGE_TYPES.includes(fileMimeType);
+
+    // ── Stage A: Image preprocessing ─────────────────────────────────────────
+    const processedBuffer = await preprocessForOCR(fileBuffer, fileMimeType);
+
+    // ── Stage B: Quality gate (non-blocking — warns but doesn't block) ────────
+    let imageQualityWarning: string | undefined;
+    if (isImageFile) {
+      const quality = await checkImageQuality(fileBuffer);
+      if (quality.isLowRes) {
+        imageQualityWarning = quality.warning;
+        console.warn("[Quality]", quality.warning);
+      }
     }
 
-    // ── AI Analysis + Persist ──────────────────────────────────────────────────
+    // ── Stage C: OCR — Vision API for images, pdf-parse/Tesseract for PDFs ───
+    let ocrText = "";
+    try {
+      const visionOCR = createVisionOCR();
+      if (isImageFile && visionOCR) {
+        const ocrResult = await visionOCR.extractText(processedBuffer, fileMimeType);
+        ocrText = ocrResult.text;
+        console.log(`[OCR] provider=${ocrResult.provider} confidence=${ocrResult.confidence} chars=${ocrText.length}`);
+      } else {
+        const ocrAdapter = await getOCRAdapter();
+        const ocrResult = await ocrAdapter.extractText(processedBuffer, fileMimeType);
+        ocrText = ocrResult.text;
+        console.log(`[OCR] provider=${ocrResult.provider} confidence=${ocrResult.confidence} chars=${ocrText.length}`);
+      }
+      if (ocrText.length < 50) {
+        console.warn("[OCR] Very short output — image may be low quality or blank");
+      }
+    } catch (err) {
+      console.error("OCR failed:", err);
+      if (!isImageFile) {
+        return NextResponse.json({ error: "Failed to extract text from the bill." }, { status: 500 });
+      }
+      // For images: non-fatal — LLM will note the empty input
+    }
+
+    // ── Stage D: Post-process extracted text ─────────────────────────────────
+    ocrText = cleanOCRText(ocrText);
+
+    // ── Stage E–F: AI Analysis + JSON validation + Persist ───────────────────
     let analysisId: string;
     try {
       const aiAdapter = await getAIAdapter();
@@ -70,7 +117,59 @@ export async function POST(req: NextRequest) {
         caseId,
         ocrText,
         episode: episode as EpisodeOfCare,
+        conditionContext: conditionEntry,
       });
+
+      // Validate and coerce AI output schema before any downstream use
+      validateAIOutput(aiOutput);
+      // ── Sanity-check AI output: fix hallucinated totals ───────────────────────
+      // Recalculate totalBilled from line items if AI value seems wrong
+      const lineItemsSum = aiOutput.lineItems.reduce((s, i) => s + (i.totalPrice || 0), 0);
+      if (
+        lineItemsSum > 0 &&
+        (aiOutput.totalBilled <= 0 ||
+          Math.abs(lineItemsSum - aiOutput.totalBilled) / (aiOutput.totalBilled || 1) > 0.3)
+      ) {
+        // AI-provided total deviates >30% from line items sum — use line items sum
+        aiOutput.totalBilled = lineItemsSum;
+      }
+
+      // ── Heuristic post-pass: upgrade AI flags using pattern matching ──────────
+      const heuristicFlags = runAllHeuristics(
+        aiOutput.lineItems as Parameters<typeof runAllHeuristics>[0],
+        episode,
+        conditionEntry
+      );
+      heuristicFlags.forEach((flag) => {
+        const item = aiOutput.lineItems[flag.lineItemIndex];
+        if (!item) return;
+        // Only upgrade severity — never downgrade a flag the AI already set
+        if (item.flagStatus === "valid") {
+          item.flagStatus = "review_needed";
+          item.flagReason = flag.reason;
+        } else if (item.flagStatus === "review_needed" && flag.severity === "alert") {
+          item.flagStatus = "possibly_overcharged";
+          item.flagReason = item.flagReason
+            ? `${item.flagReason} Additionally: ${flag.reason}`
+            : flag.reason;
+        }
+      });
+      // Recalculate totalFlagged after heuristic upgrades — always derived from line items
+      aiOutput.totalFlagged = aiOutput.lineItems
+        .filter((i) => i.flagStatus !== "valid")
+        .reduce((sum, i) => sum + i.totalPrice, 0);
+
+      // Hard constraint: flagged can never exceed total billed
+      if (aiOutput.totalFlagged > aiOutput.totalBilled) {
+        aiOutput.totalFlagged = aiOutput.totalBilled;
+      }
+
+      // Potential savings = sum of estimatedSavings from the AI's savings opportunities
+      aiOutput.potentialSavings = aiOutput.savingsOpportunities.reduce(
+        (sum, opp) => sum + (opp.estimatedSavings ?? 0),
+        0
+      );
+
       const drafts = await aiAdapter.generateDrafts(aiOutput, episode as EpisodeOfCare);
 
       const supabase = await createServiceClient();
@@ -175,11 +274,12 @@ export async function POST(req: NextRequest) {
       ]);
       if (outputsError) console.error("Outputs insert error:", outputsError.message);
     } catch (err) {
-      console.error("Analysis failed:", err);
-      return NextResponse.json({ error: "Analysis failed. Please try again." }, { status: 500 });
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Analysis failed:", msg);
+      return NextResponse.json({ error: `Analysis failed: ${msg}` }, { status: 500 });
     }
 
-    return NextResponse.json({ analysisId }, { status: 200 });
+    return NextResponse.json({ analysisId, warning: imageQualityWarning ?? null }, { status: 200 });
   } catch (err) {
     console.error("Unexpected error in /api/analyze:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

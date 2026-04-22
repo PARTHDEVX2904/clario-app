@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function CTASection() {
@@ -40,15 +39,14 @@ export function CTASection() {
 
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Link href="/upload">
-              <Button size="xl" className="gap-2 group w-full sm:w-auto">
-                Analyze my bill — free
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+              <Button size="xl" className="w-full sm:w-auto">
+                Get started for free
               </Button>
             </Link>
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground">
-            No account required. 100% free to start. Results in under a minute.
+            Results under one minute.
           </p>
         </motion.div>
       </div>

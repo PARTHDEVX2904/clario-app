@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Activity } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Inter } from "next/font/google";
 
@@ -19,14 +19,15 @@ export function Header() {
   const router = useRouter();
 
   const navLinks = [
-    { label: "How it works", href: "#how-it-works" },
+    { label: "Process", href: "#how-it-works" },
     { label: "Features", href: "#features" },
+    { label: "FAQ", href: "#faq" },
     { label: "Privacy", href: "#trust" },
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
-      <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-background/90 backdrop-blur-sm">
+      <div className="mx-auto max-w-6xl px-6 py-2.5 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
@@ -36,23 +37,21 @@ export function Header() {
               router.refresh();
             }
           }}
-          className="flex items-center gap-2.5 group"
+          className="flex items-center gap-1.5 group"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-white shadow-sm group-hover:bg-primary-600 transition-colors">
-            <Activity className="h-4 w-4" />
-          </div>
-          <span className={`${inter.className} text-2xl font-bold text-foreground tracking-tight`}>
+          <img src="/logo.svg" alt="" className="h-7 w-7" />
+          <span className={`${inter.className} text-xl font-bold text-black tracking-tight`}>
             Clario
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-foreground hover:text-primary-600 transition-colors"
+              className="text-sm font-medium text-black hover:text-primary-600 transition-colors"
             >
               {link.label}
             </a>
@@ -61,13 +60,8 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="outline" size="sm">
-              Sign in
-            </Button>
-          </Link>
           <Link href="/upload">
-            <Button size="sm">Analyze my bill</Button>
+            <Button size="sm" className="px-5 rounded-lg">Get started</Button>
           </Link>
         </div>
 
@@ -103,11 +97,8 @@ export function Header() {
                 </a>
               ))}
               <div className="pt-2 border-t border-border flex flex-col gap-2">
-                <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full">Sign in</Button>
-                </Link>
                 <Link href="/upload" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full">Analyze my bill</Button>
+                  <Button className="w-full">Get started</Button>
                 </Link>
               </div>
             </nav>

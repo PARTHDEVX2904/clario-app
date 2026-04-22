@@ -5,6 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 type Mode = "signin" | "signup";
 
@@ -18,6 +22,7 @@ export function AuthForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -49,14 +54,37 @@ export function AuthForm() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+      if (error) setError(error.message);
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
   return (
     <div className="rounded-2xl border border-border bg-white shadow-card-lg p-8">
-      <h1 className="text-xl font-semibold text-foreground mb-1">
-        {mode === "signin" ? "Sign in to Clario" : "Create your account"}
+      {/* Logo */}
+      <div className="flex justify-center mb-5">
+        <Link href="/">
+          <img src="/logo.svg" alt="Clario" className="h-12 w-12" />
+        </Link>
+      </div>
+
+      <h1 className={`${inter.className} text-xl font-semibold text-foreground mb-1 text-center`}>
+        {mode === "signin" ? "Access Your Billing Dashboard" : "Create your account"}
       </h1>
-      <p className="text-sm text-muted-foreground mb-6">
+      <p className="text-sm text-muted-foreground mb-6 text-center">
         {mode === "signin"
-          ? "Securely access your billing analyses."
+          ? "Sign in to your account to continue"
           : "Free account. No credit card required."}
       </p>
 
@@ -84,7 +112,7 @@ export function AuthForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            placeholder="Enter your email"
             className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
           />
         </div>
@@ -102,7 +130,7 @@ export function AuthForm() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
             />
             <button
@@ -120,6 +148,28 @@ export function AuthForm() {
           {mode === "signin" ? "Sign in" : "Create account"}
         </Button>
       </form>
+
+      {/* Divider */}
+      <div className="my-5 text-center">
+        <span className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">Or continue with</span>
+      </div>
+
+      {/* Google sign-in */}
+      <button
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={googleLoading}
+        className="w-full flex items-center justify-center gap-2.5 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-60"
+      >
+        {/* Google logo */}
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+        </svg>
+        {googleLoading ? "Redirecting…" : "Google"}
+      </button>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}

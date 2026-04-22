@@ -5,6 +5,7 @@ import type {
   GeneratedOutput,
   EpisodeOfCare,
 } from "@/types";
+import type { ConditionEntry } from "@/lib/billing/conditions-kb";
 
 // ── Input params ──────────────────────────────────────────────────────────────
 
@@ -12,6 +13,8 @@ export interface AnalysisParams {
   caseId: string;
   ocrText: string;
   episode: EpisodeOfCare;
+  /** Resolved condition entry from the knowledge base — injected into AI prompt */
+  conditionContext?: ConditionEntry;
 }
 
 // ── Output shape ──────────────────────────────────────────────────────────────
@@ -49,6 +52,14 @@ export async function getAIAdapter(): Promise<AIAdapter> {
     case "openai": {
       const { OpenAIAdapter } = await import("./openai");
       return new OpenAIAdapter();
+    }
+    case "gemini": {
+      const { GeminiAdapter } = await import("./gemini");
+      return new GeminiAdapter();
+    }
+    case "groq": {
+      const { GroqAdapter } = await import("./groq");
+      return new GroqAdapter();
     }
     case "mock":
     default: {

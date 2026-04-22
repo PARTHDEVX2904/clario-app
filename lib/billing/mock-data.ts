@@ -29,14 +29,14 @@ export function getMockAnalysis(id: string): {
     caseId: `case-${uuidv4()}`,
     status: "complete",
     createdAt: new Date().toISOString(),
-    plainSummary: `Your bill from City Care Hospital totals **₹1,15,500** for a 2-day stay related to an abdominal complaint. After your insurance covers an estimated ₹68,000, your out-of-pocket responsibility is shown as **₹47,500**.
+    plainSummary: `Your bill from City Care Hospital totals **₹11,250** for a 2-day stay related to an abdominal complaint. After your insurance covers an estimated ₹6,800, your out-of-pocket responsibility is shown as **₹4,450**.
 
-Our review found several charges that deserve a closer look: a CT scan appears to be billed **twice** (which may be a duplicate), a vague ₹18,000 "Facility Fee" lacks itemization, IV saline bags are priced at **₹800/unit** (roughly 4× the typical rate), and a ₹2,500 "Administrative Processing Fee" is not a standard billable charge.
+Our review found several charges that deserve a closer look: a CT scan appears to be billed **twice** (which may be a duplicate), a vague ₹1,800 "Facility Fee" lacks itemization, IV saline bags are priced at **₹80/unit** (roughly 4× the typical rate), and a ₹250 "Administrative Processing Fee" is not a standard billable charge.
 
-You may be able to reduce your bill by **₹25,000–₹32,000** through a combination of requesting an itemized bill, disputing the duplicate CT charge, and negotiating the facility fee.`,
-    totalBilled: 115500,
-    totalFlagged: 55000,
-    potentialSavings: 28000,
+You may be able to reduce your bill by **₹2,500–₹3,200** through a combination of requesting an itemized bill, disputing the duplicate CT charge, and negotiating the facility fee.`,
+    totalBilled: 11250,
+    totalFlagged: 5200,
+    potentialSavings: 6000,
     confidenceScore: 0.84,
     disclaimer:
       "This analysis is informational support only. It is not legal advice, medical advice, or a guarantee of any billing outcome.",
@@ -47,8 +47,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "Emergency Room Visit - Level 5",
         cptCode: "99285",
         quantity: 1,
-        unitPrice: 22000,
-        totalPrice: 22000,
+        unitPrice: 1800,
+        totalPrice: 1800,
         dateOfService: "2024-11-14",
         flagStatus: "review_needed",
         flagReason:
@@ -61,8 +61,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "Physician Fee - ER",
         cptCode: "99285",
         quantity: 1,
-        unitPrice: 6000,
-        totalPrice: 6000,
+        unitPrice: 600,
+        totalPrice: 600,
         dateOfService: "2024-11-14",
         flagStatus: "valid",
         confidence: 0.91,
@@ -73,8 +73,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "CT Scan - Abdomen/Pelvis (74177)",
         cptCode: "74177",
         quantity: 1,
-        unitPrice: 15000,
-        totalPrice: 15000,
+        unitPrice: 1500,
+        totalPrice: 1500,
         dateOfService: "2024-11-14",
         flagStatus: "valid",
         confidence: 0.89,
@@ -85,8 +85,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "CT Scan - Abdomen/Pelvis — POSSIBLE DUPLICATE",
         cptCode: "74177",
         quantity: 1,
-        unitPrice: 15000,
-        totalPrice: 15000,
+        unitPrice: 1500,
+        totalPrice: 1500,
         dateOfService: "2024-11-14",
         flagStatus: "possibly_overcharged",
         flagReason:
@@ -100,8 +100,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "CBC with Differential (85025)",
         cptCode: "85025",
         quantity: 1,
-        unitPrice: 1500,
-        totalPrice: 1500,
+        unitPrice: 150,
+        totalPrice: 150,
         dateOfService: "2024-11-14",
         flagStatus: "valid",
         confidence: 0.88,
@@ -112,8 +112,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "CBC with Differential — POSSIBLE DUPLICATE",
         cptCode: "85025",
         quantity: 1,
-        unitPrice: 1500,
-        totalPrice: 1500,
+        unitPrice: 150,
+        totalPrice: 150,
         dateOfService: "2024-11-14",
         flagStatus: "review_needed",
         flagReason:
@@ -126,8 +126,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "Comprehensive Metabolic Panel (80053)",
         cptCode: "80053",
         quantity: 1,
-        unitPrice: 2800,
-        totalPrice: 2800,
+        unitPrice: 280,
+        totalPrice: 280,
         dateOfService: "2024-11-14",
         flagStatus: "valid",
         confidence: 0.87,
@@ -138,13 +138,13 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "IV Solutions Normal Saline 1000mL",
         cptCode: "A4217",
         quantity: 4,
-        unitPrice: 800,
-        totalPrice: 3200,
+        unitPrice: 80,
+        totalPrice: 320,
         dateOfService: "2024-11-14",
         flagStatus: "possibly_overcharged",
         flagReason:
-          "IV saline bags are billed at ₹800/unit. Typical hospital charge ranges are ₹150–₹300/unit. At 4 units, this represents a potential ₹2,000–₹2,600 overcharge. Request a price justification.",
-        suggestedPrice: 1200,
+          "IV saline bags are billed at ₹80/unit. Typical hospital charge ranges are ₹15–₹30/unit. At 4 units, this represents a potential ₹200–₹260 overcharge. Request a price justification.",
+        suggestedPrice: 120,
         confidence: 0.81,
       },
       {
@@ -153,12 +153,12 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         description: "Room & Board - Medical/Surgical (2 days)",
         cptCode: "0120",
         quantity: 2,
-        unitPrice: 12000,
-        totalPrice: 24000,
+        unitPrice: 1200,
+        totalPrice: 2400,
         dateOfService: "2024-11-15",
         flagStatus: "review_needed",
         flagReason:
-          "Daily room charge of ₹12,000 is on the higher end for a standard medical/surgical bed. Compare against the hospital's published rate card if available.",
+          "Daily room charge of ₹1,200 is on the higher end for a standard medical/surgical bed. Compare against the hospital's published rate card if available.",
         confidence: 0.65,
       },
       {
@@ -166,12 +166,12 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         analysisId,
         description: "Facility Fee - General",
         quantity: 1,
-        unitPrice: 18000,
-        totalPrice: 18000,
+        unitPrice: 1800,
+        totalPrice: 1800,
         dateOfService: "2024-11-15",
         flagStatus: "possibly_overcharged",
         flagReason:
-          "A generic ₹18,000 'Facility Fee' without itemization is a common area of concern. Hospitals must provide a detailed breakdown upon request. This type of catch-all fee is sometimes reducible or contestable.",
+          "A generic ₹1,800 'Facility Fee' without itemization is a common area of concern. Hospitals must provide a detailed breakdown upon request. This type of catch-all fee is sometimes reducible or contestable.",
         suggestedPrice: 0,
         confidence: 0.88,
       },
@@ -202,8 +202,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         analysisId,
         description: "Pharmacy - Normal Saline IV piggyback",
         quantity: 1,
-        unitPrice: 1800,
-        totalPrice: 1800,
+        unitPrice: 180,
+        totalPrice: 180,
         dateOfService: "2024-11-16",
         flagStatus: "review_needed",
         flagReason:
@@ -215,8 +215,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         analysisId,
         description: "Administrative Processing Fee",
         quantity: 1,
-        unitPrice: 2500,
-        totalPrice: 2500,
+        unitPrice: 250,
+        totalPrice: 250,
         dateOfService: "2024-11-16",
         flagStatus: "possibly_overcharged",
         flagReason:
@@ -229,8 +229,8 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
         analysisId,
         description: "Discharge Planning Fee",
         quantity: 1,
-        unitPrice: 1200,
-        totalPrice: 1200,
+        unitPrice: 120,
+        totalPrice: 120,
         dateOfService: "2024-11-16",
         flagStatus: "review_needed",
         flagReason:
@@ -242,7 +242,7 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
       {
         id: uuidv4(),
         description: "Dispute the duplicate CT scan charge",
-        estimatedSavings: 15000,
+        estimatedSavings: 1500,
         actionRequired:
           "Call the hospital billing department and request removal of the second CT scan (CPT 74177) billed on 11/14/2024. Reference your medical records to confirm only one scan was performed.",
         priority: "high",
@@ -250,25 +250,25 @@ You may be able to reduce your bill by **₹25,000–₹32,000** through a combi
       {
         id: uuidv4(),
         description: "Request itemization of the Facility Fee",
-        estimatedSavings: 9000,
+        estimatedSavings: 900,
         actionRequired:
-          "Request a fully itemized breakdown of the ₹18,000 Facility Fee in writing. Many hospitals reduce or waive this fee when patients formally request justification.",
+          "Request a fully itemized breakdown of the ₹1,800 Facility Fee in writing. Many hospitals reduce or waive this fee when patients formally request justification.",
         priority: "high",
       },
       {
         id: uuidv4(),
         description: "Challenge the Administrative Processing Fee",
-        estimatedSavings: 2500,
+        estimatedSavings: 250,
         actionRequired:
-          "Dispute the ₹2,500 administrative processing fee in your dispute letter. This type of charge is widely regarded as non-billable.",
+          "Dispute the ₹250 administrative processing fee in your dispute letter. This type of charge is widely regarded as non-billable.",
         priority: "high",
       },
       {
         id: uuidv4(),
         description: "Negotiate IV supply pricing",
-        estimatedSavings: 2400,
+        estimatedSavings: 240,
         actionRequired:
-          "Request a price reduction on IV saline bags. Reference typical hospital supply costs (₹150–₹300/unit) and ask for an adjustment to the ₹800/unit charge.",
+          "Request a price reduction on IV saline bags. Reference typical hospital supply costs (₹15–₹30/unit) and ask for an adjustment to the ₹80/unit charge.",
         priority: "medium",
       },
       {
@@ -336,17 +336,17 @@ I am writing to formally dispute several charges on my itemized bill for service
 
 DISPUTED ITEMS:
 
-1. DUPLICATE CT SCAN CHARGE (CPT 74177, ₹15,000)
+1. DUPLICATE CT SCAN CHARGE (CPT 74177, ₹1,500)
    A CT Scan of the Abdomen/Pelvis (CPT 74177) appears twice on my bill dated 11/14/2024. Based on my understanding of my care, only one scan was performed. I request written confirmation and removal of any duplicate charge.
 
-2. UNITEMIZED FACILITY FEE (₹18,000)
+2. UNITEMIZED FACILITY FEE (₹1,800)
    A line item labeled "Facility Fee – General" appears on my bill without itemization. I have the right to a fully itemized explanation of this charge. I request a detailed breakdown or removal of this fee.
 
-3. ADMINISTRATIVE PROCESSING FEE (₹2,500)
+3. ADMINISTRATIVE PROCESSING FEE (₹250)
    This fee does not correspond to any recognized clinical service. I request its removal from my account balance.
 
-4. IV SUPPLY PRICING (₹800/unit × 4 units = ₹3,200)
-   I have been charged ₹800 per unit for standard IV saline solution. Typical hospital charges range from ₹150–₹300/unit. I request a price adjustment or justification for this significant markup.
+4. IV SUPPLY PRICING (₹80/unit × 4 units = ₹320)
+   I have been charged ₹80 per unit for standard IV saline solution. Typical hospital charges range from ₹15–₹30/unit. I request a price adjustment or justification for this significant markup.
 
 REQUESTED ACTIONS:
 - Provide a written response within 30 days acknowledging receipt of this dispute
@@ -385,21 +385,21 @@ OPENING
 ─────────────────────────────────────────────
 DUPLICATE CHARGE (PRIORITY 1)
 ─────────────────────────────────────────────
-"I see a CT scan billed twice on the same date — November 14th. Could you check my records and confirm whether two separate scans were ordered and performed? If only one scan occurred, I'd like to request the duplicate charge of ₹15,000 be removed."
+"I see a CT scan billed twice on the same date — November 14th. Could you check my records and confirm whether two separate scans were ordered and performed? If only one scan occurred, I'd like to request the duplicate charge of ₹1,500 be removed."
 
 [Tip: Be specific about the date and CPT code. Don't accept "let me note that" — ask for a case number.]
 
 ─────────────────────────────────────────────
 FACILITY FEE (PRIORITY 2)
 ─────────────────────────────────────────────
-"I have a ₹18,000 Facility Fee on my bill with no itemization. Could you explain exactly what services this covers? I'd also like to know if this fee can be waived or reduced given my situation."
+"I have a ₹1,800 Facility Fee on my bill with no itemization. Could you explain exactly what services this covers? I'd also like to know if this fee can be waived or reduced given my situation."
 
 [Tip: If they push back, say "I'm happy to receive this in writing if that's easier."]
 
 ─────────────────────────────────────────────
 ADMINISTRATIVE FEE (PRIORITY 3)
 ─────────────────────────────────────────────
-"There's a ₹2,500 Administrative Processing Fee on my bill. Can you clarify what clinical service this corresponds to? I'm not aware of any recognized billable service by this description."
+"There's a ₹250 Administrative Processing Fee on my bill. Can you clarify what clinical service this corresponds to? I'm not aware of any recognized billable service by this description."
 
 ─────────────────────────────────────────────
 FINANCIAL ASSISTANCE
@@ -444,12 +444,12 @@ Dear Patient Experience Department,
 I received care at City Care Hospital in November 2024 related to an abdominal complaint requiring emergency care, imaging, and a 2-night inpatient stay. I have significant concerns with the billing I received.
 
 SUMMARY OF CONCERNS:
-After careful review, I identified approximately ₹28,000 in charges that appear to be duplicated, vague, or inconsistent with standard billing practices:
+After careful review, I identified approximately ₹2,800 in charges that appear to be duplicated, vague, or inconsistent with standard billing practices:
 
-• A CT scan appears to have been billed twice on the same date (₹15,000)
-• A ₹18,000 "Facility Fee" lacks required itemization
+• A CT scan appears to have been billed twice on the same date (₹1,500)
+• A ₹1,800 "Facility Fee" lacks required itemization
 • IV supply charges are approximately 4× typical market rates
-• An "Administrative Processing Fee" of ₹2,500 is not a recognized clinical charge
+• An "Administrative Processing Fee" of ₹250 is not a recognized clinical charge
 
 These concerns raise questions about the accuracy and transparency of billing practices, which may affect other patients who do not have the resources to review their bills in detail.
 

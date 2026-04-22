@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Inter } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -9,10 +9,20 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Clario — Understand Your Medical Bill",
     template: "%s | Clario",
+  },
+  icons: {
+    icon: "/logo.svg",
   },
   description:
     "Clario helps patients understand hospital bills in plain English, spot potential overcharges, and generate dispute letters — powered by AI.",
@@ -39,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} font-sans antialiased`}>
+      <body className={`${dmSans.variable} ${inter.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

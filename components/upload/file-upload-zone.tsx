@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Upload, FileText, X, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { formatFileSize } from "@/lib/utils/format";
@@ -25,7 +25,7 @@ export function FileUploadZone({
     "image/jpeg": [".jpg", ".jpeg"],
     "image/png": [".png"],
   },
-  maxSize = 10 * 1024 * 1024, // 10MB
+  maxSize = 10 * 1024 * 1024,
   file,
   onFileSelect,
   required = false,
@@ -54,15 +54,14 @@ export function FileUploadZone({
     maxFiles: 1,
   });
 
-  // Separate the onClick from motion.div to avoid prop conflicts
   const rootProps = getRootProps();
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-1.5">
-        <label className="text-sm font-medium text-foreground">
+      <div className="flex items-center justify-between mb-2">
+        <label className="text-sm font-semibold text-slate-700">
           {label}
-          {required && <span className="ml-1 text-destructive">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
         </label>
         {file && (
           <button
@@ -71,7 +70,7 @@ export function FileUploadZone({
               e.stopPropagation();
               onFileSelect(undefined);
             }}
-            className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
+            className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 font-medium"
           >
             <X className="h-3 w-3" />
             Remove
@@ -81,57 +80,70 @@ export function FileUploadZone({
 
       <AnimatePresence mode="wait">
         {file ? (
-          <div
+          <motion.div
             key="file"
-            className="flex items-center gap-3 rounded-xl border border-accent-200 bg-accent-50 p-4"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4"
           >
-            <div className="h-10 w-10 rounded-lg bg-white border border-accent-200 flex items-center justify-center shrink-0">
-              <FileText className="h-5 w-5 text-accent-600" />
+            <div className="h-10 w-10 rounded-xl bg-white border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm">
+              <FileText className="h-5 w-5 text-emerald-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
+              <p className="text-sm font-semibold text-foreground truncate">{file.name}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{formatFileSize(file.size)}</p>
             </div>
-            <CheckCircle2 className="h-5 w-5 text-accent-600 shrink-0" />
-          </div>
+            <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+          </motion.div>
         ) : (
-          <div
+          <motion.div
             key="dropzone"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+          >
+          <div
             {...rootProps}
             className={cn(
-              "flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-150",
+              "flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-200",
               isDragActive
-                ? "border-primary-400 bg-primary-50"
-                : "border-border bg-background hover:border-primary-300 hover:bg-muted/50"
+                ? "border-[#2F2FE4] bg-[#2F2FE4]/5 scale-[1.01]"
+                : "border-slate-200 bg-slate-50/40 hover:border-[#2F2FE4]/40 hover:bg-[#2F2FE4]/3"
             )}
           >
             <input {...getInputProps()} />
             <div
               className={cn(
-                "h-10 w-10 rounded-xl flex items-center justify-center transition-colors",
-                isDragActive ? "bg-primary-100" : "bg-muted"
+                "h-12 w-12 rounded-2xl flex items-center justify-center transition-all duration-200",
+                isDragActive
+                  ? "bg-[#2F2FE4]/15 scale-110"
+                  : "bg-gradient-to-br from-[#2F2FE4]/10 to-blue-50"
               )}
             >
               <Upload
                 className={cn(
                   "h-5 w-5 transition-colors",
-                  isDragActive ? "text-primary-600" : "text-muted-foreground"
+                  isDragActive ? "text-[#2F2FE4]" : "text-[#2F2FE4]/60"
                 )}
               />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">
-                {isDragActive ? "Drop file here" : "Upload or drag & drop"}
+              <p className="text-sm font-semibold text-foreground">
+                {isDragActive ? "Drop your file here" : "Upload or drag & drop"}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-slate-400 mt-1">
                 {description || "PDF, JPG, or PNG · Max 10MB"}
               </p>
             </div>
           </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
     </div>
   );
 }

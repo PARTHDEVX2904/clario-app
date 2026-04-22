@@ -1,7 +1,10 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils/cn";
+
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 interface StepProgressProps {
   steps: string[];
@@ -10,16 +13,18 @@ interface StepProgressProps {
 
 export function StepProgress({ steps, currentStep }: StepProgressProps) {
   return (
-    <div className="w-full">
-      {/* Mobile: step X of Y */}
+    <div className={`${inter.className} w-full`}>
+      {/* Mobile: progress bar */}
       <div className="sm:hidden mb-6">
-        <p className="text-xs font-medium text-muted-foreground mb-1">
-          Step {currentStep + 1} of {steps.length}
-        </p>
-        <p className="text-sm font-semibold text-foreground">{steps[currentStep]}</p>
-        <div className="mt-3 h-1 bg-muted rounded-full overflow-hidden">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            Step {currentStep + 1} of {steps.length}
+          </p>
+          <p className="text-xs font-bold text-[#2F2FE4]">{steps[currentStep]}</p>
+        </div>
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary-500 rounded-full transition-all duration-500"
+            className="h-full bg-[#2F2FE4] rounded-full transition-all duration-500"
             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           />
         </div>
@@ -34,40 +39,33 @@ export function StepProgress({ steps, currentStep }: StepProgressProps) {
           return (
             <div key={i} className="flex items-center flex-1 last:flex-none">
               <div className="flex flex-col items-center">
-                {/* Circle */}
                 <div
                   className={cn(
-                    "h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 border-2",
+                    "h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
                     isComplete
-                      ? "bg-primary-500 border-primary-500 text-white"
+                      ? "bg-[#2F2FE4] text-white shadow-sm shadow-[#2F2FE4]/30"
                       : isCurrent
-                      ? "border-primary-500 bg-white text-primary-600"
-                      : "border-border bg-muted text-muted-foreground"
+                      ? "bg-white border-2 border-[#2F2FE4] text-[#2F2FE4] shadow-sm shadow-[#2F2FE4]/15"
+                      : "bg-slate-50 border border-slate-200 text-slate-400"
                   )}
                 >
-                  {isComplete ? (
-                    <Check className="h-3.5 w-3.5" />
-                  ) : (
-                    <span>{i + 1}</span>
-                  )}
+                  {isComplete ? <Check className="h-3.5 w-3.5" /> : <span>{i + 1}</span>}
                 </div>
-                {/* Label */}
                 <span
                   className={cn(
-                    "mt-1.5 text-[11px] font-medium text-center leading-tight max-w-[72px]",
-                    isCurrent ? "text-primary-600" : "text-muted-foreground"
+                    "mt-1.5 text-[11px] font-semibold text-center leading-tight max-w-[72px]",
+                    isCurrent ? "text-[#2F2FE4]" : isComplete ? "text-slate-500" : "text-slate-400"
                   )}
                 >
                   {step}
                 </span>
               </div>
 
-              {/* Connector */}
               {i < steps.length - 1 && (
                 <div className="flex-1 mx-2 mb-5">
-                  <div className="h-px w-full bg-border overflow-hidden">
+                  <div className="h-0.5 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary-400 transition-all duration-500"
+                      className="h-full bg-[#2F2FE4] rounded-full transition-all duration-500"
                       style={{ width: isComplete ? "100%" : "0%" }}
                     />
                   </div>

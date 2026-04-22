@@ -1,25 +1,18 @@
 import Link from "next/link";
-import { Activity } from "lucide-react";
-import {Merriweather} from "next/font/google"
+import { Inter } from "next/font/google";
 
-const merriweather = Merriweather({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
-})
+const inter = Inter({ subsets: ["latin"], weight: ["600"] });
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="border-t border-border bg-[#F5F5F5]">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary-500 text-white">
-                <Activity className="h-3.5 w-3.5" />
-              </div>
-              <span className={`${merriweather.className} text-lg font-bold text-foreground`}>Clario</span>
+            <Link href="/" className="flex items-center gap-1 mb-4">
+              <img src="/logo.svg" alt="" className="h-10 w-10" />
+              <span className={`${inter.className} text-2xl font-bold text-black`}>Clario</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               Clario helps patients understand medical bills, identify questionable charges, and take action — with confidence.

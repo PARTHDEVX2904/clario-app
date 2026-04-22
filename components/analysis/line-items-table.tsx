@@ -45,7 +45,7 @@ export function LineItemsTable({ lineItems }: LineItemsTableProps) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-white shadow-card overflow-hidden">
+    <div className="rounded-xl border border-border bg-[#FAFAFA] shadow-card overflow-hidden">
       {/* Header + filter */}
       <div className="px-6 py-4 border-b border-border">
         <h2 className="text-base font-semibold text-foreground mb-3">

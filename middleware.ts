@@ -38,6 +38,11 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Let the OAuth callback through without any auth redirects
+  if (pathname.startsWith("/auth/callback")) {
+    return supabaseResponse;
+  }
+
   // Unauthenticated user trying to access a protected route → /login
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
   if (!user && isProtected) {
