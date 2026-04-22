@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   if (code) {
     const cookieStore = await cookies();
 
+    // Create the redirect response first so session cookies are set ON it,
+    // not on a separate response object that gets discarded.
+    const redirectResponse = NextResponse.redirect(`${origin}${next}`);
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,9 +23,13 @@ export async function GET(request: NextRequest) {
             return cookieStore.getAll();
           },
           setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options as Parameters<typeof cookieStore.set>[2])
-            );
+            cookiesToSet.forEach(({ name, value, options }) => {
+              redirectResponse.cookies.set(
+                name,
+                value,
+                options as Parameters<typeof redirectResponse.cookies.set>[2]
+              );
+            });
           },
         },
       }
@@ -30,10 +38,9 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      return redirectResponse;
     }
   }
 
-  // Something went wrong — send back to login
   return NextResponse.redirect(`${origin}/login?error=oauth_failed`);
 }
