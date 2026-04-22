@@ -5,7 +5,10 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  // Sanitize next: must be a relative path and not the root (which is the landing page)
+  const rawNext = searchParams.get("next") ?? "";
+  const next =
+    rawNext.startsWith("/") && rawNext !== "/" ? rawNext : "/dashboard";
 
   if (code) {
     const cookieStore = await cookies();
