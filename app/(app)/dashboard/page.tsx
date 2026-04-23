@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Upload } from "lucide-react";
 import { AppHeader } from "@/components/layout/app-header";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 import { RecentAnalyses } from "@/components/dashboard/recent-analyses";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { Button } from "@/components/ui/button";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import type { AnalysisResult } from "@/types";
 
@@ -41,7 +38,7 @@ async function getRecentAnalyses(): Promise<DashboardAnalysis[]> {
       .in("case_id", caseIds)
       .eq("status", "complete")
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(100);
 
     if (error || !rows || rows.length === 0) return [];
 
@@ -94,42 +91,21 @@ export default async function DashboardPage({
 
   const totalBilled = analyses.reduce((s, a) => s + a.totalBilled, 0);
   const totalSavings = analyses.reduce((s, a) => s + a.potentialSavings, 0);
-  const flaggedCount = analyses.reduce((s, a) => s + a.lineItems.filter((i) => i.flagStatus !== "valid").length, 0);
 
   return (
     <>
       <AppHeader
         title={searchQuery ? `Results for "${searchQuery}"` : "Dashboard"}
-        subtitle={searchQuery ? `${analyses.length} matching analysis${analyses.length !== 1 ? "es" : ""}` : "Your medical billing analyses"}
+        subtitle={searchQuery ? `${analyses.length} matching analysis` : "Your medical billing analysis"}
       />
 
       <div className="px-6 py-8 max-w-6xl mx-auto">
-        {/* Welcome banner (first time) */}
-        {!hasAnalyses && (
-          <div className="rounded-2xl border border-primary-100 bg-primary-50 px-6 py-5 mb-8 flex items-center justify-between gap-6">
-            <div>
-              <h2 className="text-base font-semibold text-foreground mb-1">
-                Welcome to Mediva
-              </h2>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Upload your first medical bill to get a plain-English breakdown, identify potential overcharges, and find ways to reduce your out-of-pocket costs.
-              </p>
-            </div>
-            <Link href="/upload" className="shrink-0">
-              <Button className="gap-2">
-                <Upload className="h-4 w-4" />
-                Analyze a bill
-              </Button>
-            </Link>
-          </div>
-        )}
 
         {/* Stats */}
         {hasAnalyses && (
           <DashboardStats
             totalBilled={totalBilled}
             totalSavings={totalSavings}
-            flaggedCount={flaggedCount}
             analysesCount={analyses.length}
           />
         )}
@@ -139,7 +115,7 @@ export default async function DashboardPage({
           <RecentAnalyses analyses={analyses} />
         ) : searchQuery ? (
           <div className="rounded-xl border border-border bg-white shadow-card px-6 py-12 text-center">
-            <p className="text-sm font-semibold text-foreground mb-1">No matching analyses</p>
+            <p className="text-sm font-semibold text-foreground mb-1">No matching analysis</p>
             <p className="text-xs text-muted-foreground">No bills found for &quot;{searchQuery}&quot;. Try a different provider name.</p>
           </div>
         ) : (

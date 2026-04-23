@@ -14,7 +14,7 @@ interface StatsCardProps {
   icon: LucideIcon;
   iconColor?: string;
   iconBg?: string;
-  valueColo?: string;
+  valueColor?: string;
   accentBar?: string;
   trend?: { value: string; positive: boolean };
   delay?: number;
@@ -27,7 +27,7 @@ export function StatsCard({
   icon: Icon,
   iconColor = "text-[#09637E]",
   iconBg = "bg-[#E6F4F7]",
-  valueColo,
+  valueColor,
   accentBar = "bg-[#09637E]",
   trend,
   delay = 0,
@@ -49,7 +49,7 @@ export function StatsCard({
         </div>
       </div>
 
-      <p className={cn("text-[1.65rem] font-bold tracking-tight leading-none", valueColo ?? "text-slate-900")}>
+      <p className={cn("text-[1.65rem] font-bold tracking-tight leading-none", valueColor ?? "text-slate-900")}>
         {value}
       </p>
 

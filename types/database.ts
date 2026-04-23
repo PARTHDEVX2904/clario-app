@@ -144,6 +144,27 @@ export interface Database {
           Database["public"]["Tables"]["generated_outputs"]["Row"]
         >;
       };
+      profiles: {
+        Row: {
+          id: string;
+          full_name: string | null;
+          email: string | null;
+          avatar_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["profiles"]["Row"],
+          "created_at" | "updated_at"
+        > &
+          Partial<
+            Pick<
+              Database["public"]["Tables"]["profiles"]["Row"],
+              "created_at" | "updated_at"
+            >
+          >;
+        Update: Partial<Database["public"]["Tables"]["profiles"]["Row"]>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

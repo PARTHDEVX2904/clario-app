@@ -59,7 +59,7 @@ export function Header() {
         </nav>
 
         {/* CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-5">
           <Link
             href="/login"
             className={`${inter.className} text-sm font-semibold text-black hover:text-black/70 transition-colors`}
@@ -67,7 +67,7 @@ export function Header() {
             Log In
           </Link>
           <Link href="/login?mode=signup">
-            <Button size="sm" className="px-5 rounded-lg">Sign Up</Button>
+            <Button size="sm" className="px-4 rounded-lg text-sm">Sign Up</Button>
           </Link>
         </div>
 

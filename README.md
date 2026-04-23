@@ -1,151 +1,145 @@
-# Clario — Healthcare Billing Intelligence
+# Clario
 
-Clario is a patient-facing app that helps people understand hospital and medical bills in plain English, identify potentially questionable charges, find savings opportunities, and generate dispute/negotiation documents.
-
-## Features
-
-- **Bill upload + OCR** — Upload PDF or image bills; text is extracted automatically
-- **AI analysis** — Every line item analyzed, flagged as valid / review needed / possibly overcharged
-- **Duplicate detection** — Same charge, same date, same CPT code flagged automatically
-- **Savings opportunities** — Prioritized actions to reduce your bill
-- **Dispute letter generator** — Ready-to-send dispute letter, negotiation phone guide, and complaint letter
-- **Privacy-first** — No account required; no data sold
+**Clario helps patients understand hospital bills in plain English, spot overcharges, and generate dispute letters.**
 
 ---
 
-## Quick start
+## What it does
 
-### 1. Clone and install
-```bash
-git clone <your-repo>
-cd clario
-npm install
-```
-
-### 2. Set up environment variables
-```bash
-cp .env.local.example .env.local
-```
-
-Fill in your credentials — or leave the `mock` providers for local development (no API keys needed).
-
-| Variable | Notes |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only) |
-| `OPENAI_API_KEY` | Only needed if `AI_PROVIDER=openai` |
-| `AI_PROVIDER` | `mock` (default) or `openai` |
-| `OCR_PROVIDER` | `mock` (default) or `tesseract` |
-
-### 3. Run the dev server
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
-
-### 4. Demo the analysis
-Navigate to `/analysis/demo` to see a full working example with realistic mock data — no file upload needed.
-
----
-
-## Scripts
-
-```bash
-npm run dev       # Start dev server (localhost:3000)
-npm run build     # Production build
-npm run start     # Start production server
-npm run typecheck # TypeScript check
-npm run lint      # ESLint
-```
+1. Patient uploads a medical bill (PDF or photo)
+2. OCR extracts the text from the document
+3. AI analyses every charge and flags suspicious items
+4. Patient gets a plain-English breakdown and can download a dispute letter, phone script, or complaint letter
 
 ---
 
 ## Tech stack
 
-| Layer | Technology |
+| Layer | Tool |
 |---|---|
-| Framework | Next.js 16 (App Router) |
+| Framework | Next.js 15 (App Router) + React 19 |
 | Language | TypeScript (strict) |
-| Styling | Tailwind CSS v3 |
-| Animation | Framer Motion |
-| AI | OpenAI GPT-4o (adapter pattern — default: mock) |
-| OCR | Tesseract.js (adapter pattern — default: mock) |
+| Styling | Tailwind CSS v3 + Framer Motion |
+| AI | Groq (llama-3.3-70b) or Gemini 2.0 Flash |
+| OCR | Vision model (Groq/Gemini) for images, pdf-parse for PDFs |
 | Database | Supabase (Postgres + Auth + Storage) |
 | Deployment | Vercel |
 
 ---
 
-## Architecture
+## Getting started
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/PARTHDEVX2904/clario-app.git
+cd clario-app
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment variables
+cp .env.local.example .env.local
+
+# 4. Start the dev server
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
+
+---
+
+## Environment variables
+
+| Variable | Required | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | From Supabase project settings |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | From Supabase project settings |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-only — never expose to client |
+| `GROQ_API_KEY` | If using Groq | |
+| `GEMINI_API_KEY` | If using Gemini | |
+| `AI_PROVIDER` | Yes | `mock`, `groq`, or `gemini` |
+| `OCR_PROVIDER` | Yes | `mock` or `tesseract` |
+
+---
+
+## Project structure
 
 ```
 app/
-  (marketing)/           # Landing page (no sidebar)
-  (app)/                 # App shell with sidebar
-    dashboard/           # Bill overview
-    upload/              # Multi-step intake flow
-    analysis/[id]/       # Bill analysis results
-  api/
-    analyze/             # POST — OCR + AI pipeline
-    analysis/[id]/       # GET — fetch analysis by ID
+  (marketing)/     # Public pages — landing, privacy
+  (app)/           # Authenticated pages — dashboard, upload, analysis
+  api/             # Server-only API routes
 
 components/
-  ui/                    # Button, Card, Badge, Input, etc.
-  layout/                # Header, Footer, Sidebar, AppHeader
-  marketing/             # Landing page sections
-  dashboard/             # Stats, recent analyses, empty state
-  upload/                # File upload zone, step progress, stepper
-  analysis/              # Summary, line items table, savings, dispute draft
+  ui/              # Reusable primitives — Button, Card, Badge
+  layout/          # Sidebar, Header, AppHeader
+  dashboard/       # Stats cards, recent analysis list
+  upload/          # Multi-step bill upload form
+  analysis/        # Analysis result display
 
 lib/
-  ai/                    # AI adapter interface + mock + OpenAI
-  ocr/                   # OCR adapter interface + mock + Tesseract
-  billing/               # Heuristics (duplicate, vague fees, care mismatch)
-  supabase/              # Browser + server clients + schema.sql
-  utils/                 # cn(), formatCurrency(), formatDate()
+  ai/              # AI provider adapters (groq, gemini, mock)
+  ocr/             # OCR adapters + image preprocessing
+  supabase/        # DB clients — browser + server
+  utils/           # cn(), formatCurrency(), formatDateRelative()
 
-types/                   # Domain types (Bill, LineItem, AnalysisResult, etc.)
+types/             # Shared TypeScript types + Supabase DB types
 ```
 
 ---
 
 ## Database setup
 
-If using Supabase, run the schema:
+Run `lib/supabase/schema.sql` in your **Supabase Dashboard → SQL Editor**.
 
-1. Open your Supabase project → SQL editor
-2. Paste and run `lib/supabase/schema.sql`
+Tables created (all with Row Level Security):
+
+- `cases` — patient episode context
+- `documents` — uploaded bill files + OCR output
+- `bill_analyses` — AI analysis results per case
+- `bill_line_items` — individual charge line items
+- `generated_outputs` — dispute letters and scripts
+- `profiles` — public mirror of auth.users, auto-created on signup
 
 ---
 
-## Enabling real AI/OCR
+## Bill processing pipeline
 
-**OpenAI:**
-```env
-OPENAI_API_KEY=sk-...
-AI_PROVIDER=openai
+```
+Upload → Preprocess image (sharp) → Vision OCR → Clean text → LLM analysis → Validate JSON → Save to DB
 ```
 
-**Tesseract (local OCR):**
+Charge flag types:
+
+| Flag | Meaning |
+|---|---|
+| `valid` | Charge is consistent with the care reported |
+| `review_needed` | Worth questioning — ask for itemised breakdown |
+| `possibly_overcharged` | Significantly above expected norms |
+
+All flags are informational only — not legal or medical advice.
+
+---
+
+## Scripts
+
 ```bash
-npm install tesseract.js
-```
-```env
-OCR_PROVIDER=tesseract
+npm run dev       # Dev server
+npm run build     # Production build
+npm run lint      # ESLint
 ```
 
 ---
 
-## Deployment (Vercel)
+## Deployment
 
 1. Push to GitHub
 2. Import project in Vercel
-3. Set all environment variables in Vercel project settings
+3. Add all environment variables in Vercel project settings
 4. Deploy
 
 ---
 
 ## Disclaimer
 
-Clario provides informational support only. It is not legal advice, medical advice, or a guarantee of any billing outcome. Always consult a certified patient advocate, healthcare attorney, or your insurance company for definitive guidance.
+Clario provides informational support only. It is not legal or medical advice. Always consult a certified patient advocate or healthcare attorney for definitive guidance.

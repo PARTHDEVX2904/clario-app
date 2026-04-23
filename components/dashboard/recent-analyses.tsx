@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
@@ -38,32 +39,41 @@ function StatusBadge({ status }: { status: string }) {
   }
 }
 
+const PAGE_SIZE = 10;
+
 export function RecentAnalyses({ analyses }: RecentAnalysesProps) {
+  const [showAll, setShowAll] = useState(false);
+
   if (analyses.length === 0) return null;
+
+  const visible = showAll ? analyses : analyses.slice(0, PAGE_SIZE);
+  const hasMore = analyses.length > PAGE_SIZE;
 
   return (
     <div className={`${inter.className} rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden`}>
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">Recent analyses</h2>
+          <h2 className="text-sm font-bold text-slate-900">Recent analysis</h2>
           <p className="text-[11px] text-slate-400 font-medium mt-0.5">{analyses.length} bills reviewed</p>
         </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#09637E] hover:text-[#088395] transition-colors"
-        >
-          View all <ArrowRight className="h-3 w-3" />
-        </Link>
+        {hasMore && (
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#09637E] hover:text-[#088395] transition-colors"
+          >
+            {showAll ? "Show less" : "View all"} <ArrowRight className="h-3 w-3" />
+          </button>
+        )}
       </div>
 
       <div className="divide-y divide-slate-100">
-        {analyses.map((analysis, i) => (
+        {visible.map((analysis, i) => (
           <motion.div
             key={analysis.id}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05, duration: 0.3 }}
+            transition={{ delay: i * 0.04, duration: 0.3 }}
           >
             <Link
               href={`/analysis/${analysis.id}`}

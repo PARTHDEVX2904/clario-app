@@ -65,7 +65,7 @@ export function AuthForm() {
           password,
           options: {
             data: { full_name: name.trim() },
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           },
         });
         if (error) {
@@ -91,6 +91,7 @@ export function AuthForm() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          queryParams: { prompt: "select_account" },
         },
       });
       if (error) setError(error.message);
