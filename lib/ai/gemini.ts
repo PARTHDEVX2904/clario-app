@@ -113,7 +113,8 @@ Return this exact JSON shape:
 
   async generateDrafts(
     analysis: AIAnalysisOutput,
-    episode: EpisodeOfCare
+    episode: EpisodeOfCare,
+    patientName?: string
   ): Promise<GeneratedDrafts> {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",

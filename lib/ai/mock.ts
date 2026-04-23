@@ -250,7 +250,8 @@ You may be able to reduce your bill by **$3,450–$4,200** through a combination
 
   async generateDrafts(
     analysis: AIAnalysisOutput,
-    episode: EpisodeOfCare
+    episode: EpisodeOfCare,
+    patientName?: string
   ): Promise<GeneratedDrafts> {
     await new Promise((r) => setTimeout(r, 1200));
 

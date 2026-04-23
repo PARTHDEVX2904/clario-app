@@ -186,7 +186,8 @@ export class GroqAdapter implements AIAdapter {
 
   async generateDrafts(
     analysis: AIAnalysisOutput,
-    episode: EpisodeOfCare
+    episode: EpisodeOfCare,
+    patientName?: string
   ): Promise<GeneratedDrafts> {
     const flaggedItems = analysis.lineItems
       .filter((i) => i.flagStatus !== "valid")
@@ -196,12 +197,15 @@ export class GroqAdapter implements AIAdapter {
       )
       .join("\n");
 
+    const name = patientName?.trim() || "[Your Name]";
+
     const prompt = `Generate three documents for an Indian hospital billing dispute.
 
 IMPORTANT: Return a JSON object with exactly three keys: disputeDraft, negotiationScript, complaintLetter.
 Each value MUST be a plain text STRING (a complete, ready-to-send document). Do NOT nest JSON objects inside the values — each value is a multi-line string only.
 
 Context:
+- Patient name: ${name}
 - Hospital: ${episode.providerName} (${episode.providerCity}, ${episode.providerState}), India
 - Health issue: ${episode.healthIssueDescription}
 - Total billed: ₹${analysis.totalBilled}
@@ -210,9 +214,9 @@ ${flaggedItems || "None identified"}
 - Potential savings: ₹${analysis.potentialSavings}
 
 Documents needed (each must be a complete plain-text letter/script string, not a JSON object):
-1. disputeDraft: Formal letter to the hospital billing department. Start with "Date: [Current Date]", then "To: The Billing Manager, ${episode.providerName}". Include patient name as "[Your Name]", address as "[Your Address]". When listing the flagged charges, format them as a numbered list (one charge per line, e.g. "  1. Duplicate LFT Test — ₹1500 (reason)"), NOT as a comma-separated inline sentence. After the list, request itemized justification for each. Reference Consumer Protection Act 2019. Close with "Sincerely,\n[Your Name]".
+1. disputeDraft: Formal letter to the hospital billing department. Start with "Date: [Current Date]", then "To: The Billing Manager, ${episode.providerName}". Use "${name}" as the patient name throughout. When listing the flagged charges, format them as a numbered list (one charge per line, e.g. "  1. Duplicate LFT Test — ₹1500 (reason)"), NOT as a comma-separated inline sentence. After the list, request itemized justification for each. Reference Consumer Protection Act 2019. Close with "Sincerely,\n${name}".
 2. negotiationScript: Step-by-step phone script. Start with "PHONE NEGOTIATION GUIDE". Use numbered steps, include exact phrases to say, what to ask for, and how to escalate.
-3. complaintLetter: Formal complaint to Medical Superintendent / Patient Relations Officer. Mention escalation to State Medical Council or National Consumer Helpline (1800-11-4000) if unresolved.
+3. complaintLetter: Formal complaint to Medical Superintendent / Patient Relations Officer. Use "${name}" as the patient name. Mention escalation to State Medical Council or National Consumer Helpline (1800-11-4000) if unresolved.
 
 All amounts in INR (₹). Each document must be professional, specific, and actionable. Values are plain strings — no nested JSON.`;
 

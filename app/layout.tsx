@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Inter } from "next/font/google";
+import { TopLoader } from "@/components/layout/top-loader";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -50,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${inter.variable} font-sans antialiased`}>
+        <TopLoader />
         {children}
       </body>
     </html>

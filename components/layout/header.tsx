@@ -60,8 +60,14 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/upload">
-            <Button size="sm" className="px-5 rounded-lg">Get started</Button>
+          <Link
+            href="/login"
+            className={`${inter.className} text-sm font-semibold text-black hover:text-black/70 transition-colors`}
+          >
+            Log In
+          </Link>
+          <Link href="/login?mode=signup">
+            <Button size="sm" className="px-5 rounded-lg">Sign Up</Button>
           </Link>
         </div>
 
@@ -97,8 +103,11 @@ export function Header() {
                 </a>
               ))}
               <div className="pt-2 border-t border-border flex flex-col gap-2">
-                <Link href="/upload" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full">Get started</Button>
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" className="w-full">Log In</Button>
+                </Link>
+                <Link href="/login?mode=signup" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full">Sign Up</Button>
                 </Link>
               </div>
             </nav>

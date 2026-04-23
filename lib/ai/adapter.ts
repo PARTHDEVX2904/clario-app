@@ -40,7 +40,8 @@ export interface AIAdapter {
   analyzeBill(params: AnalysisParams): Promise<AIAnalysisOutput>;
   generateDrafts(
     analysis: AIAnalysisOutput,
-    episode: EpisodeOfCare
+    episode: EpisodeOfCare,
+    patientName?: string
   ): Promise<GeneratedDrafts>;
 }
 

@@ -170,7 +170,8 @@ export async function POST(req: NextRequest) {
         0
       );
 
-      const drafts = await aiAdapter.generateDrafts(aiOutput, episode as EpisodeOfCare);
+      const patientName = (user?.user_metadata?.full_name as string | undefined) ?? undefined;
+      const drafts = await aiAdapter.generateDrafts(aiOutput, episode as EpisodeOfCare, patientName);
 
       const supabase = await createServiceClient();
 

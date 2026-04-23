@@ -95,7 +95,8 @@ Return this exact JSON shape:
 
   async generateDrafts(
     analysis: AIAnalysisOutput,
-    episode: EpisodeOfCare
+    episode: EpisodeOfCare,
+    patientName?: string
   ): Promise<GeneratedDrafts> {
     const flaggedItems = analysis.lineItems
       .filter((i) => i.flagStatus !== "valid")

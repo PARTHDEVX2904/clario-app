@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] }
 
 interface SidebarProps {
   userEmail?: string | null;
+  userName?: string | null;
 }
 
 const navItems = [
@@ -24,11 +25,11 @@ const bottomItems = [
   { label: "Settings", href: "#", icon: Settings },
 ];
 
-export function Sidebar({ userEmail }: SidebarProps) {
+export function Sidebar({ userEmail, userName }: SidebarProps) {
   const pathname = usePathname();
 
-  const initials  = userEmail ? userEmail.slice(0, 2).toUpperCase() : "P";
-  const displayName = userEmail ? userEmail.split("@")[0] : "Patient";
+  const displayName = userName || (userEmail ? userEmail.split("@")[0] : "Patient");
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
     <aside className={`${inter.className} hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-slate-100 bg-[#F5F5F5] z-30`}>
